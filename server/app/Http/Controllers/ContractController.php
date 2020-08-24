@@ -24,10 +24,15 @@ class ContractController extends Controller
         $contract = Contract::query();
 
         if ($searchTerm) {
+            $contract->join('properties', 'contracts.property_id', '=', 'properties.id');
+            $contract->select('contracts.*'); // remove properties.*, prevent duplicate columns names
             $contract->where( function ($query) use ($searchTerm) {
                 $query->where('tenant_name', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('tenant_email', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('tenant_document', 'LIKE', "%{$searchTerm}%");
+                    ->orWhere('tenant_document', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('properties.address_street', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('properties.address_city', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('properties.address_state', 'LIKE', "%{$searchTerm}%");
             });
         }
 
